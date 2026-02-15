@@ -25,13 +25,16 @@ with st.sidebar:
     
     # API Key handling
     api_key_env = os.getenv("OPENROUTER_API_KEY")
-    if not api_key_env:
+    
+    if api_key_env:
+        meta_agent.OPENROUTER_API_KEY = api_key_env
+        st.success("API Key loaded from environment")
+    else:
+        # Fallback to manual entry if env/secrets missing
         user_key = st.text_input("Enter OpenRouter Key:", type="password")
         if user_key:
             meta_agent.OPENROUTER_API_KEY = user_key
             st.success("Key set!")
-    else:
-        st.success("API Key loaded from environment")
 
 # Initialize chat history
 if "messages" not in st.session_state:
