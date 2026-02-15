@@ -1,4 +1,6 @@
 litellm
 python-dotenv
 streamlit
-watchdog
+openai
+google-generativeai
+anthropic

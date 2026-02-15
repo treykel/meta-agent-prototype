@@ -6,7 +6,7 @@ import meta_agent
 # Page config
 st.set_page_config(
     page_title="Metatron Prototype",
-    page_icon="�",
+    page_icon="🦾",
     layout="centered"
 )
 
@@ -14,7 +14,7 @@ st.set_page_config(
 load_dotenv()
 
 # Title and Intro
-st.title("️� Metatron")
+st.title("🦾 Metatron")
 st.caption("The Voice of the Agents. Automatically routes to Grok, Gemini, Claude, or GPT.")
 
 # Sidebar for debug/info
@@ -44,37 +44,39 @@ if "messages" not in st.session_state:
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
-        if "meta" in message:
-             st.caption(f"Routed to: {message['meta']}")
 
 # Chat input
 if prompt := st.chat_input("Ask me anything..."):
-    # Check for key
-    if not meta_agent.OPENROUTER_API_KEY:
-        st.error("Please set your OpenRouter API Key in .env or the sidebar.")
-        st.stop()
-
-    # Add user message to state
+    # Add user message to history
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
 
-    # Generate response
+    # Display assistant response
     with st.chat_message("assistant"):
-        with st.spinner("Classifying and routing..."):
-            try:
-                # Call the meta-agent logic
-                # We'll mock the image_url for now in this simple UI, but support can be added
-                answer, model_used, category = meta_agent.route_and_respond(prompt)
+        # Placeholder for routing info
+        status_placeholder = st.empty()
+        
+        # Call Meta-Agent
+        with st.spinner("Metatron is thinking..."):
+            response, model_used, category = meta_agent.route_and_respond(prompt)
+            
+            # Show routing decision
+            if model_used != "None":
+                if "grok" in model_used:
+                    icon = "🤖" # Grok
+                elif "claude" in model_used:
+                    icon = "👨‍💻" # Claude
+                elif "gemini" in model_used:
+                    icon = "🧠" # Gemini
+                else:
+                    icon = "🌐" # GPT
                 
-                st.markdown(answer)
-                st.caption(f"🎯 Intept: **{category.upper()}** → 🧠 Model: `{model_used}`")
-                
-                # Add assistant message to state
-                st.session_state.messages.append({
-                    "role": "assistant", 
-                    "content": answer, 
-                    "meta": f"{category} ({model_used})"
-                })
-            except Exception as e:
-                st.error(f"Error: {e}")
+                status_placeholder.info(f"{icon} Routed query ({category}) to **{model_used}**")
+            else:
+                 status_placeholder.error(response) # Show error if key missing
+
+            st.markdown(response)
+    
+    # Add assistant response to history
+    st.session_state.messages.append({"role": "assistant", "content": response})
