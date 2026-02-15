@@ -5,8 +5,8 @@ import meta_agent
 
 # Page config
 st.set_page_config(
-    page_title="Meta-Agent Prototype",
-    page_icon="🤖",
+    page_title="Metatron Prototype",
+    page_icon="�",
     layout="centered"
 )
 
@@ -14,8 +14,8 @@ st.set_page_config(
 load_dotenv()
 
 # Title and Intro
-st.title("🤖 Meta-Agent")
-st.caption("One prompt, four experts. Automatically routes to Grok, Gemini, Claude, or GPT.")
+st.title("️� Metatron")
+st.caption("The Voice of the Agents. Automatically routes to Grok, Gemini, Claude, or GPT.")
 
 # Sidebar for debug/info
 with st.sidebar:
