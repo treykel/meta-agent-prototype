@@ -23,7 +23,7 @@ CLASSIFIER_MODEL = "x-ai/grok-2-vision-1212"   # Or use "google/gemini-flash-1.5
 def classify_query(query: str) -> str:
     """Quick classification with a cheap model"""
     messages = [
-        {"role": "system", "content": "Classify this query in ONE WORD only: coding, reasoning, multimodal, real-time, or general."},
+        {"role": "system", "content": "Classify this query into one of five categories: 'coding', 'reasoning', 'multimodal', 'real-time', or 'general'. Return ONLY the category word.\n\n- 'coding': Writing code, debugging, software engineering.\n- 'reasoning': Math problems, logic puzzles, deep thinking.\n- 'multimodal': Queries involving images or vision.\n- 'real-time': News, current events, weather, sports scores, or live data.\n- 'general': Casual chat, creative writing, or anything else."},
         {"role": "user", "content": query}
     ]
     
@@ -47,16 +47,21 @@ def classify_query(query: str) -> str:
         print(f"Classification failed: {e}")
         return "general"
 
-def route_and_respond(query: str, image_url=None):
+def route_and_respond(query: str, image_url=None, manual_model=None):
     # Use the global key
     key_to_use = OPENROUTER_API_KEY
     if not key_to_use:
         return "Please set your OpenRouter API Key in .env or the sidebar.", "None", "Error"
 
-    category = classify_query(query)
-    
-    chosen_model = MODEL_MAP.get(category, MODEL_MAP["general"])
-    print(f"Routing to: {chosen_model}")
+    if manual_model and manual_model != "Auto (Best Model)":
+        category = "manual"
+        chosen_model = manual_model
+        print(f"Manual override: {chosen_model}")
+    else:
+        # Auto-routing
+        category = classify_query(query)
+        chosen_model = MODEL_MAP.get(category, MODEL_MAP["general"])
+        print(f"Routing to: {chosen_model}")
     
     messages = [{"role": "user", "content": query}]
     

@@ -14,7 +14,7 @@ st.set_page_config(
 load_dotenv()
 
 # Title and Intro
-st.title("🦾 Metatron")
+st.title("🦾 Metatron v1.1")
 st.caption("The Voice of the Agents. Automatically routes to Grok, Gemini, Claude, or GPT.")
 
 # Sidebar for debug/info
@@ -35,6 +35,16 @@ with st.sidebar:
         if user_key:
             meta_agent.OPENROUTER_API_KEY = user_key
             st.success("Key set!")
+
+    with st.expander("Advanced Options"):
+        # Manual Model Selector
+        model_options = ["Auto (Best Model)"] + [m for m in meta_agent.MODEL_MAP.values()]
+        selected_model = st.selectbox("Force specific model:", model_options)
+        
+        # Clear Chat
+        if st.button("Clear Chat History"):
+            st.session_state.messages = []
+            st.rerun()
 
 # Initialize chat history
 if "messages" not in st.session_state:
@@ -59,7 +69,7 @@ if prompt := st.chat_input("Ask me anything..."):
         
         # Call Meta-Agent
         with st.spinner("Metatron is thinking..."):
-            response, model_used, category = meta_agent.route_and_respond(prompt)
+            response, model_used, category = meta_agent.route_and_respond(prompt, manual_model=selected_model)
             
             # Show routing decision
             if model_used != "None":
